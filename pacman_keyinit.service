@@ -1,0 +1,12 @@
+[Unit]
+Description=Pacman Init
+After=network.target
+
+[Service]
+Type=oneshot
+ExecStart=pacman-key --init
+ExecStart=pacman-key --populate archlinuxarm
+ExecStart=systemctl disable pacman_keyinit.service
+
+[Install]
+WantedBy=multi-user.target
