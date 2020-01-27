@@ -1,15 +1,19 @@
 #!/bin/bash
 
 press_any_key() {
-    read -n 1
+    read -r -n 1
 }
 sleep_or_wait_for_keypress() {
-    [[ $DEBUG ]] && echo "Press any key to continue..." && press_any_key || sleep 1
+    if [[ $DEBUG ]]; then
+        echo "Press any key to continue..." && press_any_key
+    else
+        sleep 1
+    fi
 }
 
 TMP_DIR=/tmp/arch_pi
 
-if [[ ! "/dev" =~ "$1*" ]] && [ ! -b "$1" ]; then
+if [[ ! "/dev" =~ $1* ]] && [ ! -b "$1" ]; then
     echo "Needs a valid device (ex: /dev/sda)"
     exit
 fi
@@ -38,27 +42,27 @@ echo "Setting up partition..."
 
    sleep 1
    echo 'w';    # write the partition table
-) | fdisk ${TGTDEV} || exit 1
+) | fdisk "${TGTDEV}" || exit 1
 sleep_or_wait_for_keypress
 
 
 echo "Partprobe..."
-partprobe -s ${TGTDEV}
+partprobe -s "${TGTDEV}"
 sleep_or_wait_for_keypress
 
 echo "mkfs..."
-mkfs.vfat ${TGTDEV}1
-mkfs.ext4 -F ${TGTDEV}2
+mkfs.vfat "${TGTDEV}1"
+mkfs.ext4 -F "${TGTDEV}2"
 sleep_or_wait_for_keypress
 
 echo "Setting up environment..."
 mkdir -p ${TMP_DIR}/root
-mount ${TGTDEV}2 ${TMP_DIR}/root
+mount "${TGTDEV}2" ${TMP_DIR}/root
 
 mkdir -p ${TMP_DIR}/root/boot
-mount ${TGTDEV}1 ${TMP_DIR}/root/boot
+mount "${TGTDEV}1" ${TMP_DIR}/root/boot
 
-cd ${TMP_DIR}
+cd "${TMP_DIR}" || return
 sleep_or_wait_for_keypress
 
 
@@ -79,24 +83,24 @@ sleep_or_wait_for_keypress
 
 echo "Copying SSH key"
 mkdir -p root/root/.ssh
-cat /home/$SUDO_USER/.ssh/id_rsa.pub > root/root/.ssh/authorized_keys
+cat "/home/$SUDO_USER/.ssh/id_rsa.pub" > root/root/.ssh/authorized_keys
 sleep_or_wait_for_keypress
 
 echo "Setting up /etc/shadow"
-cat << EOF > root/etc/shadow
-root::17775::::::
-bin:!!:17775::::::
-daemon:!!:17775::::::
-mail:!!:17775::::::
-ftp:!!:17775::::::
-http:!!:17775::::::
-nobody:!!:17775::::::
-dbus:!!:17775::::::
-systemd-journal-remote:!!:17775::::::
-systemd-coredump:!!:17775::::::
-uuidd:!!:17775::::::
-alarm::17775:0:99999:7:::
-EOF
+cat <<-EOF > root/etc/shadow
+	root::17775::::::
+	bin:!!:17775::::::
+	daemon:!!:17775::::::
+	mail:!!:17775::::::
+	ftp:!!:17775::::::
+	http:!!:17775::::::
+	nobody:!!:17775::::::
+	dbus:!!:17775::::::
+	systemd-journal-remote:!!:17775::::::
+	systemd-coredump:!!:17775::::::
+	uuidd:!!:17775::::::
+	alarm::17775:0:99999:7:::
+	EOF
 sleep_or_wait_for_keypress
 
 echo "Setting up systemd service for pacman init..."

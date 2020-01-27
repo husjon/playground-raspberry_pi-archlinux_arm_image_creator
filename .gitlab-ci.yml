@@ -8,5 +8,5 @@ before_script:
 
 lint:
   script:
-    - shellcheck *.sh **/*.sh
+    - shellcheck arch_pi_setup.sh
 
