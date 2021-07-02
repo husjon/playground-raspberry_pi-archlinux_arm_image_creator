@@ -112,7 +112,7 @@ ln -rs /etc/systemd/system/pacman_keyinit.service ${TMP_DIR}/root/etc/systemd/sy
 sleep_or_wait_for_keypress
 
 echo "Unmounting"
-umount ${TMP_DIR}/{boot,root}
+umount -R ${TMP_DIR}/root
 sleep_or_wait_for_keypress
 
 echo "Done."
