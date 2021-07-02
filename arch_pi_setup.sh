@@ -67,10 +67,13 @@ sleep_or_wait_for_keypress
 
 
 echo "Checking for ArchLinuxARM archive..."
-[ ! -f "${TMP_DIR}/ArchLinuxARM-rpi-2-latest.tar.gz" ] && \
-    echo "Archive missing, fetching: ArchLinuxARM-rpi-2-latest.tar.gz" && \
+if [[ ! -f "${TMP_DIR}/ArchLinuxARM-rpi-2-latest.tar.gz" ]]; then
+    echo "Archive missing, fetching: ArchLinuxARM-rpi-2-latest.tar.gz"
     wget -q http://os.archlinuxarm.org/os/ArchLinuxARM-rpi-2-latest.tar.gz \
         -O "${TMP_DIR}/ArchLinuxARM-rpi-2-latest.tar.gz"
+else
+    echo "Found archive: ${TMP_DIR}/ArchLinuxARM-rpi-2-latest.tar.gz"
+fi
 sleep_or_wait_for_keypress
 
 echo "Extracting..."
